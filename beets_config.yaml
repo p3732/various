@@ -1,0 +1,96 @@
+import:
+  # write metadata to music files
+  write: yes
+
+  # move imported files from source to the music directory
+  move: yes
+  copy: no
+  delete: no
+  
+  # use auto-tagging where possible
+  # do not require confirmation on strong matches
+  autotag: yes
+  timid: no
+  
+  resume: ask
+  quiet_fallback: skip
+
+# use the release-date of the original (first) release of an album?
+original_date: no
+
+plugins: [ beatport, bucket, discogs, the, inline, fetchart, bandcamp ]
+#, copyartifacts ]
+
+# Auto Tagger ----------------------------------------------------------------
+
+match:
+  strong_rec_thresh: 0.1      # match 90% or better for auto import
+  medium_rec_thresh: 0.25
+  rec_gap_thresh: 0.25
+  max_rec:
+    missing_tracks: medium
+    unmatched_tracks: medium
+
+
+
+
+
+paths:
+  # Albums/A/Artist Name/YEAR Album Name [EP]/01 - Track Name.mp3
+  default: '%bucket{%upper{%left{%the{$albumartist},1}}}/$albumartist/%if{$year,$year - } $album%if{%aunique, %aunique{albumartist album year, albumtype label catalognum albumdisambig}}/%if{$multidisc,$disc-}$track - $title'
+  # Singles/Artist Name- Track Name.mp3
+  singleton: '0_Songs/$artist - $title'
+  # Compilations/YEAR Compilation Name/01-01 - Track Name.mp3
+  comp: '0_Compilations/%if{$year,$year - } $album%if{%aunique, %aunique{albumartist album year, albumtype label catalognum albumdisambig}}/%if{$multidisc,$disc-}$track - $title'
+  # Sountracks/YEAR Soundtrack Name/01 - Track Name.mp3
+  albumtype:soundtrack: '0_Soundtracks/%if{$year,$year - } $album%if{%aunique, %aunique{albumartist album year, albumtype label catalognum albumdisambig}}/%if{$multidisc,$disc-}$track - $title'
+  
+  
+  
+### Plugin Options
+
+# Inline plugin multidisc template
+item_fields:
+  multidisc: 1 if disctotal > 1 else 0
+
+# Collects all special characters into single bucket
+bucket:
+  bucket_alpha:
+    - 1_other
+    - A
+    - B
+    - C
+    - D
+    - E
+    - F
+    - G
+    - H
+    - I
+    - J
+    - K
+    - L
+    - M
+    - N
+    - O
+    - P
+    - Q
+    - R
+    - S
+    - T
+    - U
+    - V
+    - W
+    - X
+    - Y
+    - Z
+  bucket_alpha_regex:
+    "1_other": ^[^A-Z]
+
+# Fetch fresh album art for new imports
+fetchart:
+  sources: coverart itunes amazon albumart
+  store_source: yes
+
+bandcamp:
+  lyrics: true
+  art: true
